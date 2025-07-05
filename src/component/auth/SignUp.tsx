@@ -10,17 +10,17 @@ const schema = yup.object().shape({
   name: yup.string().required(),
   email: yup.string().email().required(),
   password: yup.string().min(6).required(),
-  role: yup
-    .string()
-    .oneOf(["Admin", "Waiter", "Cashier", "Kitchen"])
-    .required(),
+  // role: yup
+  //   .string()
+  //   .oneOf(["Admin", "Waiter", "Cashier", "Kitchen"])
+  //   .required(),
   image: yup.string().required("Image is required"),
 });
 
 const SignUp = () => {
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 👈 for image preview
-  const [signUp, { isLoading }] = useSignUpMutation();
+  const [signUp] = useSignUpMutation();
 
   const {
     register,
@@ -37,7 +37,7 @@ const SignUp = () => {
     try {
       const imageUrl = await uploadImageToCloudinary(file);
       setValue("image", imageUrl);
-      setPreviewUrl(imageUrl); 
+      setPreviewUrl(imageUrl);
     } catch (error) {
       console.error("Image upload failed", error);
     } finally {
@@ -46,6 +46,7 @@ const SignUp = () => {
   };
 
   const onSubmit = async (data: FormValues) => {
+    console.log("click")
     try {
       setUploading(true);
       await signUp(data);
@@ -107,41 +108,49 @@ const SignUp = () => {
         </div>
 
         {/* Role Select */}
-        <div>
+        {/* <div>
           <select
             {...register("role")}
             className="w-full px-4 py-3 border border-gray-400 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
           >
             <option value="">Select Role</option>
             <option value="Admin">Admin</option>
-            <option value="Waiter">Waiter</option>
-            <option value="Kitchen">Kitchen</option>
             <option value="Cashier">Cashier</option>
           </select>
           {errors.role && (
             <p className="text-sm text-red-500 mt-1">{errors.role.message}</p>
           )}
-        </div>
+        </div> */}
 
         {/* File Upload */}
         <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onImageUpload}
-            className="w-full block text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-md file:bg-green-500 file:text-white hover:file:bg-green-600"
-          />
-          {uploading && (
-            <p className="text-sm text-gray-500 mt-1">Uploading image...</p>
-          )}
-          {errors.image && (
-            <p className="text-sm text-red-500 mt-1">{errors.image.message}</p>
-          )}
+          <div className="w-full">
+            <label
+              htmlFor="image-upload"
+              className="block w-full cursor-pointer border-2 border-dashed border-green-500 rounded-md p-5 text-center text-gray-600 hover:bg-green-50 transition"
+            >
+              <span className="text-sm">Click to upload an image</span>
+            </label>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={onImageUpload}
+              className="hidden"
+            />
+            {errors.image && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.image.message}
+              </p>
+            )}
+          </div>
 
           {/* 👇 Preview Image */}
           {previewUrl && (
             <div className="mt-4">
-              <p className="text-[16px] text-gray-700 mb-2 font-medium">Preview:</p>
+              <p className="text-[16px] text-gray-700 mb-2 font-medium">
+                Preview:
+              </p>
               <img
                 src={previewUrl}
                 alt="Preview"
@@ -156,13 +165,19 @@ const SignUp = () => {
           type="submit"
           disabled={uploading}
           className={`w-full bg-green-500 text-white font-semibold py-3 rounded-lg transition-all ${
-            uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+            uploading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600 cursor-pointer"
           }`}
         >
           {uploading ? "Uploading..." : "Sign Up"}
         </button>
-         <p className="text-sm text-gray-500 text-center mt-2">
-           Already have an account? <Link to="/signin" className="text-green-600 underline cursor-pointer font-semibold">Sign In</Link>
+        <p className="text-sm text-gray-500 text-center mt-2">
+          Already have an account?{" "}
+          <Link
+            to="/signin"
+            className="text-green-600 underline cursor-pointer font-semibold"
+          >
+            Sign In
+          </Link>
         </p>
       </form>
     </div>
